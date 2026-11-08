@@ -1,0 +1,6 @@
+# dsh-secure-memory bundle patch
+# One host row mounts the plugin. The same package carries the browser half via
+# its dsh.client declaration and ./client export.
+- insert:
+    - id: dsh-secure-memory
+      name: 'dsh-secure-memory'

@@ -1,0 +1,53 @@
+{
+  "name": "dsh-secure-memory",
+  "version": "0.0.2",
+  "displayName": "Cross-Workspace Memory",
+  "description": "Cross-Workspace Memory: local-first, encrypted, per-session authorized memory for DSH, with a composer bar, audit, source tracing and prompt-injection isolation.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "icon": "./icon.svg",
+  "files": [
+    "lib",
+    "docs",
+    "icon.svg",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "memory",
+    "privacy",
+    "cross-workspace",
+    "local-first"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "test": "node test/core.test.js && node test/no-session-creation.test.js && node test/tool-conflicts.test.js",
+    "benchmark": "node scripts/benchmark.mjs"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots"
+      ],
+      "platform": "web"
+    }
+  }
+}

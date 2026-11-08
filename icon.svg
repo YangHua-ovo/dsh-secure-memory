@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Secure Cross-Workspace Memory">
+  <defs>
+    <linearGradient id="bg" x1="18" y1="10" x2="112" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1f6feb"/>
+      <stop offset="0.55" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="64" y1="22" x2="64" y2="108" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#0b1220"/>
+  <rect x="6" y="6" width="116" height="116" rx="24" fill="url(#bg)" opacity="0.22"/>
+  <path d="M64 22l30 12v24c0 20-12 36-30 46-18-10-30-26-30-46V34l30-12z" fill="url(#shield)" opacity="0.96"/>
+  <path d="M64 32l21 8.5V58c0 14.5-8.5 26.6-21 34-12.5-7.4-21-19.5-21-34V40.5L64 32z" fill="#0b1220" opacity="0.9"/>
+  <g fill="#7dd3fc">
+    <circle cx="50" cy="55" r="4"/>
+    <circle cx="78" cy="50" r="4"/>
+    <circle cx="82" cy="75" r="4"/>
+    <circle cx="52" cy="78" r="4"/>
+  </g>
+  <g stroke="#7dd3fc" stroke-width="2.2" opacity="0.9">
+    <path d="M54 55h20M52 72l24-18M55 76h23M79 54l2 17"/>
+  </g>
+  <circle cx="64" cy="65" r="7" fill="#22c55e"/>
+  <path d="M61 65l2.2 2.2L68 62.5" fill="none" stroke="#052e16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
