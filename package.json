@@ -2,8 +2,7 @@
   "name": "dsh-secure-memory",
   "version": "0.0.2",
   "displayName": "Cross-Workspace Memory",
-  "description": "Cross-Workspace Memory: local-first, encrypted, per-session authorized memory for DSH, with a composer bar, audit, source tracing and prompt-injection isolation.",
-  "type": "module",
+  "description": "跨工作区安全记忆：本地优先、加密的 DSH 跨工作区记忆插件，具备逐会话授权、审计、来源追溯与提示词注入隔离功能。",
   "main": "lib/index.js",
   "exports": {
     ".": {
