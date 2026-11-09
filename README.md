@@ -1,5 +1,9 @@
 # Cross-Workspace Memory
 
+[![DeepSeek Harness](https://img.shields.io/badge/DSH-Plugin-blue)](https://github.com/topics/dsh-plugin)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Security: AES-256-GCM](https://img.shields.io/badge/Security-AES--256--GCM-green)](https://github.com/YangHua-ovo/dsh-secure-memory)
+
 **本地优先、逐工作区授权、逐会话关联、可撤销、可审计的跨工作区记忆插件（DSH / DeepSeek Harness）。**
 
 > v0.0.2：主操作入口已迁移到对话输入框上方；工作区“授权”和“本次会话关联”严格分离。  
@@ -20,7 +24,7 @@
 
 ---
 
-## 1. 先说清楚能力边界
+## 1. 明确能力边界
 
 ### 已确认支持
 
