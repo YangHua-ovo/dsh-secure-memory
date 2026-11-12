@@ -1,10 +1,13 @@
-# Cross-Workspace Memory
+# Cross-Workspace Memory v0.1.0
 
 [![DeepSeek Harness](https://img.shields.io/badge/DSH-Plugin-blue)](https://github.com/topics/dsh-plugin)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/YangHua-ovo/dsh-secure-memory/releases/tag/v0.1.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Security: AES-256-GCM](https://img.shields.io/badge/Security-AES--256--GCM-green)](https://github.com/YangHua-ovo/dsh-secure-memory)
 
-**本地优先、逐工作区授权、逐会话关联、可撤销、可审计的跨工作区记忆插件（DSH / DeepSeek Harness）。**
+**面向 DeepSeek Harness 的本地加密记忆插件：会话级精确关联、三级记忆检索、可配置上下文预算，以及原对话内的状态更新。**
+
+[下载 v0.1.0](https://github.com/YangHua-ovo/dsh-secure-memory/releases/tag/v0.1.0) · [发布说明](docs/releases/v0.1.0.md) · [使用手册](docs/04-user-guide.md)
 
 > v0.1.0 基础能力版：支持指定来源会话、三级检索与上下文预算；在原对话组件中更新状态。
 > 安全优先于功能完整性，隐私优先于检索便利性。如果官方能力不足，本插件选择明确拒绝，而不是绕过访问控制。
@@ -18,19 +21,21 @@
 - 每个会话可选择 800 / 1,200 / 1,500 的上下文预算，包含来源和安全说明。默认计数是 UTF-8 字节上界估算，**不是模型实际 Token 用量**；精确计数器接口与限制见实现说明。
 - 修复状态请求与范围保存、会话切换的竞态，迟到响应不能覆盖新状态。
 
-详见 [实现、数据兼容及验收说明](docs/v0.1.0-implementation.md)。本轮未实现附件方案中的全部侧边栏/设置页重建，也未引入神经语义 Embedding 模型。
+详见 [实现、数据兼容及验收说明](docs/v0.1.0-implementation.md)。本版使用抽取式摘要和本地词法哈希向量；侧边栏关联目录、设置页重建和神经语义 Embedding 模型尚未实现。
 
-## 0. v0.0.2 速览
+## 0. 当前版本速览
 
 - 输入框上方新增 **Cross-Workspace Memory** 紧凑功能栏。
-- 每个会话独立选择工作区；已授权 A/B/C 但本会话只选 A/C 时，B 不参与检索。
+- 每个会话独立选择来源工作区及具体会话；选择 B1/C3 后，B2 不参与检索。也可显式选择整个已授权工作区。
+- L1 优先返回关键记忆；L2 提供抽取式摘要；L3 在需要依据或结果不足时召回原文。
+- 默认上下文预算 1,200，功能栏提供 800 / 1,200 / 1,500 预设；默认显示保守估算，不冒充模型实际 Token 用量。
 - 新会话默认 **未启用、空选择**，不会继承其他会话。
 - 开关/选择/收起/刷新全部是本地状态更新，不提交消息、不创建会话。
 - 设置页保存配置或授权后，通过同源消息让功能栏原地刷新；不重载页面、不切换对话。
 - 解锁 token 在 DSH 页面运行期内存复用；打开 Settings 不需要重复输入（刷新整页/重启仍需解锁，不保存口令）。
 - Settings 页面保留，继续负责首次设置、授权、删除和审计。
 
-详见：[v0.0.2 变更说明](docs/v0.0.2-changes.md) · [v0.0.2 测试报告](docs/v0.0.2-test-report.md) · [页面刷新与会话保持修复](docs/07-session-stability-fix.md)。
+升级兼容性、已知限制及验收记录见 [v0.1.0 实现说明](docs/v0.1.0-implementation.md)。
 
 ---
 
@@ -44,8 +49,10 @@
 | DSH 本地工作区列表 | 通过官方 `ctx.workspaceRegistry` 读取 |
 | DSH 本地会话读取 | 通过官方 `ctx.sessionPersistence.open(id, 'read')` 只读读取 |
 | 逐工作区授权/暂停/撤销 | 本地管理界面 + 加密保险库 |
-| 逐会话工作区关联 | 输入框上方功能栏 + 加密 `sessionScopes`；默认关闭 |
-| 跨工作区检索 | BM25 + 本地字符 n-gram 向量（混合检索）；仅会话关联范围 |
+| 会话级精确关联 | 按来源工作区选择全部或指定会话；加密保存；新会话默认关闭 |
+| 三级记忆检索 | L1 关键记忆 → L2 抽取式摘要 → L3 原文；依据类问题访问原文 |
+| 混合召回 | BM25 + 本地词法哈希向量；先检查授权与会话选择，再召回 |
+| 上下文预算 | 预算包含正文、来源与安全说明；默认保守估算，可接入匹配模型的计数器 |
 | AI 参考上下文 | 三个只读 Tool；结果固定标记为不可信历史参考 |
 | 来源追溯 | 工作区 ID、会话 ID、事件序号、事件时间、来源引用 |
 | 检索状态反馈 | 未启用/已启用/正在检索/完成/无结果/受限/异常 + 来源摘要 |
@@ -66,7 +73,7 @@
 
 ## 2. 功能
 
-- **Composer Bar（v0.0.2）**：输入框上方总开关、会话工作区选择、索引/检索状态、来源摘要、锁定/解锁、紧凑模式。
+- **Composer Bar（v0.1.0）**：输入框上方总开关、来源工作区与会话多选、上下文预算、检索状态、来源摘要、锁定/解锁、紧凑模式。
 - **Workspace Selector**：Settings 中列出 DSH 本地工作区与手动导入源；逐工作区授权、临时/长期、暂停、撤销、默认检索。
 - **Search Panel**：自然语言查询；混合/关键词/本地向量；按工作区、时间、分类、来源过滤。
 - **Search Results**：摘要、相关度、分类、状态、可信度提示、风险、来源、时间、会话/事件定位。
@@ -112,6 +119,7 @@ lib/assets/*          # 无第三方资源的 Settings 管理 UI
 
 在当前 Harness profile 中，通过插件管理器安装本地 bundle：
 
+- Release 安装包：从 [v0.1.0 Release](https://github.com/YangHua-ovo/dsh-secure-memory/releases/tag/v0.1.0) 下载 `dsh-secure-memory-0.1.0.tgz` 并解压，选择解压后的 `package` 目录。`SHA256SUMS.txt` 提供安装包校验值。
 - 开发环境：使用 `plugin_manager` 的 `install_bundle`，目标为本目录绝对路径。
 - 用户环境：使用 DSH 的插件安装入口选择本目录（或先打包为本地包再安装）。
 
@@ -128,10 +136,11 @@ lib/assets/*          # 无第三方资源的 Settings 管理 UI
 3. 在「工作区」中，对需要参与检索的 DSH 本地工作区点击 **授权并索引**。
    - 「仅授权」只授予检索权限，不读取会话；之后可手动「同步索引」。
    - 临时授权到期会自动删除该工作区索引。
-4. 回到当前对话，在输入框上方的功能栏打开本次会话开关，勾选本次要用的工作区。
-   - 授权 ≠ 关联；未勾选的已授权工作区不参与本次检索。
+4. 回到当前对话，在输入框上方的功能栏选择来源工作区，再选择具体会话或显式勾选“全部已授权会话”，然后开启本次会话记忆。
+   - 授权 ≠ 关联；未选中的工作区与会话不参与本次检索。新勾选工作区时默认没有选择来源会话。
+   - 若列表还没有会话，可先开启并点击“刷新索引”，再选择需要的会话；索引动作本身不会扩大选择。
    - 每个会话独立；新会话默认关闭、空选择。
-5. 正常对话；AI 只能检索当前会话关联的有效工作区。栏内显示检索状态和来源摘要。
+5. 在功能栏设置上下文预算，正常对话；AI 只能检索当前会话明确选择且仍有授权的来源。询问原因或依据时可继续检索原文。
 6. Settings 仍用于审计、暂停/撤销授权、禁止检索词、一键断开/删除。
 
 手动导入 DeepSeek 历史：
@@ -166,17 +175,25 @@ lib/assets/*          # 无第三方资源的 Settings 管理 UI
 ## 8. 测试
 
 ```bash
-npm test                 # 或 node test/core.test.js
-npm run benchmark        # 本地检索基准，合成数据
+npm test                 # 完整回归测试
+npm run benchmark:v010   # v0.1.0 分层检索、范围与上下文预算基准
+npm run benchmark        # 原有词法混合检索基准
 ```
 
-当前测试覆盖：原有加密/权限/检索/审计/注入测试、会话级授权隔离、旧数据迁移、Session API、无会话创建静态检查、Tool 名冲突避让。**v0.0.2 当前 20/20 通过**（16 核心 + 2 静态 + 2 冲突）。
+**v0.1.0：29/29 项测试通过。** 覆盖加密、授权、审计、注入隔离、精确会话范围、空选择、旧数据兼容、三级召回、上下文预算、并发权限变更、HTTP API、页面请求竞态与 Tool 名冲突。
 
-测试结果与性能数据见：[v0.0.2 测试与验收报告](docs/v0.0.2-test-report.md) 和 [v0.0.1 安全测试报告](docs/03-security-test-report.md)。
+测试和合成基准记录见 [v0.1.0 实现与验收说明](docs/v0.1.0-implementation.md)。安装包只含运行文件与文档；运行测试请使用源码归档或克隆仓库。
 
 ---
 
 ## 9. 文档
+
+- [v0.1.0 发布说明](docs/releases/v0.1.0.md)
+- [v0.1.0 实现、数据模型、Token 计量与验收](docs/v0.1.0-implementation.md)
+- [用户操作手册](docs/04-user-guide.md)
+- [本地 API 文档](docs/05-api.md)
+
+历史版本与架构背景：
 
 - [v0.0.2 分析](docs/v0.0.2-analysis.md)
 - [v0.0.2 技术设计](docs/v0.0.2-design.md)
@@ -185,8 +202,6 @@ npm run benchmark        # 本地检索基准，合成数据
 - [平台能力调查报告](docs/01-platform-investigation.md)
 - [安全架构与威胁模型](docs/02-security-architecture.md)
 - [v0.0.1 安全测试报告](docs/03-security-test-report.md)
-- [用户操作手册](docs/04-user-guide.md)
-- [本地 API 文档](docs/05-api.md)
 - [已知限制与后续规划](docs/06-limitations.md)
 
 ---
