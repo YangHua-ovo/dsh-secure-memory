@@ -1,6 +1,6 @@
 {
   "name": "dsh-secure-memory",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "displayName": "Cross-Workspace Memory",
   "description": "跨工作区安全记忆：本地优先、加密的 DSH 跨工作区记忆插件，具备逐会话授权、审计、来源追溯与提示词注入隔离功能。",
   "type": "module",
@@ -33,8 +33,9 @@
   ],
   "license": "MIT",
   "scripts": {
-    "test": "node test/core.test.js && node test/no-session-creation.test.js && node test/tool-conflicts.test.js",
-    "benchmark": "node scripts/benchmark.mjs"
+    "test": "node --test test/core.test.js test/no-session-creation.test.js test/tool-conflicts.test.js test/v010.test.js test/client-state.test.js",
+    "benchmark": "node scripts/benchmark.mjs",
+    "benchmark:v010": "node scripts/benchmark-v010.mjs"
   },
   "engines": {
     "node": ">=22.12.0"
